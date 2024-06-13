@@ -8,17 +8,27 @@ function App() {
   const [newTitle, setNewTitle] = useState("");
   const[newDescription, setNewDescription] = useState("");
 
+  // Function to handle adding a new todo item
   const handleAddTodo = ()=>{
     let newTodoItem={
       title:newTitle,
       description:newDescription,
     }    
+
+    //update the todo array with the new item
     let updatedTodoArr = [...allTodos];
     updatedTodoArr.push(newTodoItem);
     setTodos(updatedTodoArr);
-    localStorage.setItem('todolist',JSON.stringify(updatedTodoArr))
+
+    //save updated todo list to local storage
+    localStorage.setItem('todolist',JSON.stringify(updatedTodoArr)) 
+
+    // Clear the input fields after adding a new todo
+    setNewTitle("");
+    setNewDescription("");
   };
 
+  //useEffect to load saved todo items from the local storage when the component mounts
   useEffect(()=>{
     let savedTodo = JSON.parse(localStorage.getItem('todolist'));
     if(savedTodo){
