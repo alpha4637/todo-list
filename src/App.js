@@ -28,6 +28,13 @@ function App() {
     setNewDescription("");
   };
 
+  const handleDeleteTodo =(index)=>{
+    let reducedTodo = [...allTodos];
+    reducedTodo.splice(index);
+    localStorage.setItem('todolist', JSON.stringify(reducedTodo));
+    setTodos(reducedTodo)
+  }
+
   //useEffect to load saved todo items from the local storage when the component mounts
   useEffect(()=>{
     let savedTodo = JSON.parse(localStorage.getItem('todolist'));
@@ -72,7 +79,7 @@ function App() {
             <p>{item.description}</p>
 
             <div className='icon-div'>          
-            <RiDeleteBin6Line />
+            <RiDeleteBin6Line onClick={()=>handleDeleteTodo(index)} title='delete'/>
             <MdDone />
             </div>
           </div> 
