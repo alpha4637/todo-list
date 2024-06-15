@@ -2,12 +2,15 @@ import './App.css';
 import { useEffect, useState } from 'react';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdDescription, MdDone } from "react-icons/md";
+import { MdOutlineEdit } from "react-icons/md";
 function App() {
   const[isCompleted, setIsCompleted] =useState(false);
   const [allTodos, setTodos]= useState([]);
   const [newTitle, setNewTitle] = useState("");
   const[newDescription, setNewDescription] = useState("");
   const[completedTodos, setCompletedTodos]= useState([]);
+  const [currentEdit,setCurrentEdit] =useState([]);
+  const[currentEditedItem, setCurrentEditedItem] = useState("");
 
   // Function to handle adding a new todo item
   const handleAddTodo = ()=>{
@@ -65,6 +68,30 @@ function App() {
     localStorage.setItem('completedTodos', JSON.stringify(reducedTodo));
     setCompletedTodos(reducedTodo) 
   }
+
+  const handleEdit =(ind,item)=>{
+    setCurrentEdit(ind);
+    setCurrentEditedItem(item);
+  }
+
+  const handleUpdateTitle =(value)=>{
+    setCurrentEditedItem((prev)=>{
+      return{...prev,title:value}
+    })
+  }
+
+  const handleUpdateDescription= (value)=>{
+    setCurrentEditedItem((prev)=>{
+      return{...prev,description:value}
+    })
+  }
+
+  const handleUpdateTodo = ()=>{
+    let newTodo = [...allTodos];
+    newTodo[currentEdit] = currentEditedItem;
+    setTodos(newTodo);
+    setCurrentEdit("");
+  }
   //useEffect to load saved todo items from the local storage when the component mounts
   useEffect(()=>{
     let savedTodo = JSON.parse(localStorage.getItem('todolist'));
@@ -100,18 +127,36 @@ function App() {
         </div>
         <div className='todo-list-wrapper'>        
           {isCompleted === false && allTodos.map((item,index)=>{
+            if(currentEdit===index){
             return(
-              <div className='todo-list-item' key={index}>
-                <div>
-            <h3>{item.title}</h3>
-            <p>{item.description}</p>
-            </div>
-            <div className='icon-div'>          
-            <RiDeleteBin6Line onClick={()=>handleDeleteTodo(index)} title='delete'/>
-            <MdDone onClick={()=> handleComplete(index)}/>
-            </div>
-          </div> 
+              <div className='edit-wrapper' key={index}>
+              <input placeholder='Updated Title'
+               value={currentEditedItem.title} 
+              onChange={(e)=>handleUpdateTitle(e.target.value)}/>
+
+              <textarea placeholder='Updated Title' value={currentEditedItem.description} 
+              onChange={(e)=>handleUpdateDescription(e.target.value)}
+              rows={4}/>      
+
+              <button type='button' className='primaryBtn' onClick={handleUpdateTodo}>Update</button>  
+              </div>
             )
+            }
+            else{
+              return(
+                <div className='todo-list-item' key={index}>
+                  <div>
+              <h3>{item.title}</h3>
+              <p>{item.description}</p>
+              </div>
+              <div className='icon-div'>          
+              <RiDeleteBin6Line onClick={()=>handleDeleteTodo(index)} title='delete'/>
+              <MdDone onClick={()=> handleComplete(index)} title='complete'/>
+              <MdOutlineEdit onClick={()=> handleEdit(index,item)} title='edit'/>
+              </div>
+            </div> 
+              )
+            }          
           })}
            {isCompleted === true && completedTodos.map((item,index)=>{
             return(
